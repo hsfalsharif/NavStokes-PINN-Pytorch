@@ -27,8 +27,14 @@ class NavStokesPINN(nn.Module):
         self.device = device
 
         self.linears = self.initialize_NN(layers)   # linear units array that contain the weights and biases
-        self.lambda_1 = torch.tensor([0.0], requires_grad=True)
-        self.lambda_2 = torch.tensor([0.0], requires_grad=True)
+        self.lambda_1 = torch.tensor([0.0], requires_grad=True).to(self.device)
+        self.lambda_2 = torch.tensor([0.0], requires_grad=True).to(self.device)
+
+        self.lambda_1 = torch.nn.Parameter(self.lambda_1)
+        self.lambda_2 = torch.nn.Parameter(self.lambda_2)
+
+        self.register_parameter('lambda_1', self.lambda_1)
+        self.register_parameter('lambda_2', self.lambda_2)
 
         self.x = torch.from_numpy(self.x).float().to(self.device)
         self.y = torch.from_numpy(self.y).float().to(self.device)
@@ -54,7 +60,7 @@ class NavStokesPINN(nn.Module):
         return linears
         
     def net_NS(self, x, y, t):      # loss_PDE
-        lambda_1 = self.lambda_1    # WILL THE LAMBDA VALUES BE OPTIMIZED BY DEFAULT??
+        lambda_1 = self.lambda_1
         lambda_2 = self.lambda_2
         x_grad = x.clone()
         x_grad.requires_grad = True
